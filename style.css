@@ -11,17 +11,18 @@ body {
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background: #111;
     font-family: Arial, sans-serif;
+    background: #111;
 }
 
 body {
-    touch-action: none;
+    touch-action: manipulation;
 }
 
-/* =========================
+
+/* =====================================
    GAME
-========================= */
+===================================== */
 
 #game {
     position: relative;
@@ -30,612 +31,512 @@ body {
     overflow: hidden;
 }
 
-/* =========================
-   SKY
-========================= */
 
-#sky {
+/* =====================================
+   MAIN MENU
+===================================== */
+
+#mainMenu {
     position: absolute;
     inset: 0;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 
     background:
         linear-gradient(
             to bottom,
-            #54b9ff 0%,
-            #9de4ff 55%,
-            #d8f7ff 100%
+            #42b8ff 0%,
+            #8de0ff 52%,
+            #63c94b 52%,
+            #358d2d 100%
         );
 
-    z-index: 0;
+    z-index: 10;
 }
 
-/* =========================
-   WORLD
-========================= */
 
-#world {
+/* ابرهای منو */
+
+#mainMenu::before,
+#mainMenu::after {
+    content: "";
+
+    position: absolute;
+
+    width: 150px;
+    height: 45px;
+
+    background: white;
+
+    border-radius: 50px;
+
+    opacity: 0.8;
+}
+
+#mainMenu::before {
+    top: 12%;
+    left: 8%;
+
+    box-shadow:
+        40px -18px 0 5px white,
+        80px 0 0 0 white;
+}
+
+#mainMenu::after {
+    top: 25%;
+    right: 10%;
+
+    transform: scale(0.7);
+}
+
+
+/* =====================================
+   LOGO
+===================================== */
+
+.logo {
+    text-align: center;
+
+    color: white;
+
+    text-shadow:
+        4px 5px 0 #333,
+        0 0 15px rgba(0,0,0,0.4);
+
+    z-index: 2;
+}
+
+.logo-mushroom {
+    font-size: 75px;
+
+    animation:
+        mushroomFloat 1.5s infinite alternate;
+}
+
+@keyframes mushroomFloat {
+
+    from {
+        transform: translateY(0);
+    }
+
+    to {
+        transform: translateY(-10px);
+    }
+}
+
+.logo h1 {
+    font-size: 52px;
+
+    letter-spacing: 4px;
+}
+
+.logo h2 {
+    margin-top: 5px;
+
+    font-size: 19px;
+
+    letter-spacing: 3px;
+}
+
+
+/* =====================================
+   MENU BUTTONS
+===================================== */
+
+.menu-buttons {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 14px;
+
+    width: min(330px, 80%);
+
+    margin-top: 35px;
+
+    z-index: 2;
+}
+
+.menu-buttons button,
+.pause-box button {
+
+    border: none;
+
+    padding: 15px 25px;
+
+    border-radius: 18px;
+
+    background:
+        linear-gradient(
+            to bottom,
+            #ffda3d,
+            #ee9c13
+        );
+
+    color: #4b2b00;
+
+    font-size: 19px;
+
+    font-weight: bold;
+
+    box-shadow:
+        0 6px 0 #9b5d00,
+        0 10px 18px rgba(0,0,0,0.25);
+
+    cursor: pointer;
+
+    transition:
+        transform 0.12s,
+        box-shadow 0.12s;
+}
+
+.menu-buttons button:active,
+.pause-box button:active {
+
+    transform:
+        translateY(5px);
+
+    box-shadow:
+        0 1px 0 #9b5d00;
+}
+
+
+/* =====================================
+   COPYRIGHT
+===================================== */
+
+.copyright {
+
+    position: absolute;
+
+    bottom: 15px;
+
+    color: white;
+
+    font-size: 12px;
+
+    opacity: 0.8;
+}
+
+
+/* =====================================
+   HIDDEN
+===================================== */
+
+.hidden {
+    display: none !important;
+}
+
+
+/* =====================================
+   WORLD MENU
+===================================== */
+
+#worldMenu,
+#levelMenu {
+
+    position: absolute;
+
+    inset: 0;
+
+    padding: 25px;
+
+    background:
+        linear-gradient(
+            to bottom,
+            #4abaff,
+            #bcefff 55%,
+            #63bf49 55%,
+            #367f2c
+        );
+
+    z-index: 20;
+
+    overflow-y: auto;
+}
+
+.menu-title {
+
+    margin: 15px 0 25px;
+
+    text-align: center;
+
+    color: white;
+
+    font-size: 32px;
+
+    text-shadow:
+        3px 3px 0 #333;
+}
+
+
+/* =====================================
+   BACK BUTTON
+===================================== */
+
+.back-button {
+
+    border: none;
+
+    padding: 10px 18px;
+
+    border-radius: 12px;
+
+    background:
+        rgba(0,0,0,0.55);
+
+    color: white;
+
+    font-size: 17px;
+
+    cursor: pointer;
+}
+
+
+/* =====================================
+   WORLD LIST
+===================================== */
+
+.world-list {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(140px, 260px));
+
+    justify-content: center;
+
+    gap: 18px;
+}
+
+.world-card {
+
+    min-height: 160px;
+
+    border: 4px solid white;
+
+    border-radius: 24px;
+
+    background:
+        rgba(0,0,0,0.45);
+
+    color: white;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 8px;
+
+    font-size: 20px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 8px 20px rgba(0,0,0,0.25);
+
+    transition:
+        transform 0.15s;
+}
+
+.world-card:active {
+
+    transform:
+        scale(0.94);
+}
+
+.world-icon {
+
+    font-size: 60px;
+}
+
+.world-card small {
+
+    font-size: 13px;
+
+    opacity: 0.8;
+}
+
+
+/* =====================================
+   LEVEL LIST
+===================================== */
+
+#levelList {
+
+    max-width: 650px;
+
+    margin: auto;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(5, 1fr);
+
+    gap: 12px;
+}
+
+.level-button {
+
+    aspect-ratio: 1;
+
+    border: 3px solid white;
+
+    border-radius: 16px;
+
+    background:
+        linear-gradient(
+            to bottom,
+            #63d24d,
+            #338e2b
+        );
+
+    color: white;
+
+    font-size: 21px;
+
+    font-weight: bold;
+
+    text-shadow:
+        2px 2px 0 #245c20;
+
+    box-shadow:
+        0 5px 0 #225d20;
+
+    cursor: pointer;
+}
+
+.level-button:active {
+
+    transform:
+        translateY(4px);
+
+    box-shadow:
+        0 1px 0 #225d20;
+}
+
+
+/* =====================================
+   GAME SCREEN
+===================================== */
+
+#gameScreen {
+
+    position: absolute;
+
+    inset: 0;
+
+    background: #5bc5ff;
+
+    overflow: hidden;
+
+    z-index: 30;
+}
+
+#gameCanvas {
+
     position: absolute;
 
     left: 0;
     top: 0;
 
-    width: 5000px;
+    width: 100%;
     height: 100%;
 
-    z-index: 5;
-
-    transition: background 0.5s;
+    display: block;
 }
 
-/* =========================
-   GROUND
-========================= */
 
-.ground {
+/* =====================================
+   HUD
+===================================== */
+
+#gameHud {
+
     position: absolute;
-
-    bottom: 0;
-
-    height: 100px;
-
-    background:
-        linear-gradient(
-            to bottom,
-            #55bd45 0px,
-            #399332 20px,
-            #8a5a32 20px,
-            #704524 100%
-        );
-
-    border-top: 6px solid #287d27;
-}
-
-/* =========================
-   PLATFORMS
-========================= */
-
-.platform {
-    position: absolute;
-
-    height: 28px;
-
-    background:
-        linear-gradient(
-            to bottom,
-            #69cf51,
-            #3b9631
-        );
-
-    border: 4px solid #286e24;
-
-    border-radius: 10px;
-}
-
-/* =========================
-   PLAYER
-========================= */
-
-#player {
-    position: absolute;
-
-    width: 48px;
-    height: 76px;
-
-    z-index: 50;
-
-    transform-origin: center bottom;
-}
-
-/* مو */
-
-.hair {
-    position: absolute;
-
-    width: 42px;
-    height: 42px;
-
-    left: 3px;
-    top: 0;
-
-    background: #3b2115;
-
-    border-radius:
-        50% 50% 40% 40%;
-}
-
-/* صورت */
-
-.face {
-    position: absolute;
-
-    width: 32px;
-    height: 34px;
-
-    left: 8px;
-    top: 10px;
-
-    background: #ffd0a5;
-
-    border-radius: 45%;
-
-    border: 2px solid #a8663c;
-
-    z-index: 2;
-}
-
-/* چشم */
-
-.eye {
-    position: absolute;
-
-    width: 4px;
-    height: 6px;
-
-    background: #222;
-
-    border-radius: 50%;
 
     top: 12px;
-}
-
-.left-eye {
-    left: 8px;
-}
-
-.right-eye {
-    right: 8px;
-}
-
-/* لبخند */
-
-.mouth {
-    position: absolute;
-
-    width: 9px;
-    height: 5px;
-
-    border-bottom: 2px solid #8d493d;
-
-    border-radius: 50%;
-
-    left: 10px;
-    top: 21px;
-}
-
-/* بدن */
-
-.body {
-    position: absolute;
-
-    width: 32px;
-    height: 30px;
-
-    left: 8px;
-    top: 43px;
-
-    background:
-        linear-gradient(
-            to right,
-            #ff4d7d,
-            #e52e60
-        );
-
-    border-radius: 10px 10px 6px 6px;
-
-    border: 2px solid #9e2345;
-}
-
-/* پاها */
-
-.leg {
-    position: absolute;
-
-    width: 11px;
-    height: 15px;
-
-    top: 69px;
-
-    background: #333;
-
-    border-radius: 5px;
-}
-
-.left-leg {
-    left: 10px;
-}
-
-.right-leg {
-    right: 10px;
-}
-
-/* =========================
-   COIN
-========================= */
-
-.coin {
-    position: absolute;
-
-    width: 30px;
-    height: 30px;
-
-    border-radius: 50%;
-
-    background:
-        radial-gradient(
-            circle at 35% 30%,
-            #fff5a0,
-            #ffd21c 45%,
-            #e49b00 100%
-        );
-
-    border: 3px solid #b97800;
-
-    box-shadow:
-        0 0 10px rgba(255, 200, 0, 0.7);
-
-    z-index: 20;
-
-    animation: coinSpin 0.8s infinite alternate;
-}
-
-@keyframes coinSpin {
-
-    from {
-        transform: scaleX(1);
-    }
-
-    to {
-        transform: scaleX(0.55);
-    }
-}
-
-/* =========================
-   ENEMIES
-========================= */
-
-.enemy {
-    position: absolute;
-
-    width: 50px;
-    height: 45px;
-
-    z-index: 30;
-
-    border-radius: 50% 50% 35% 35%;
-
-    border: 4px solid #4c2d1c;
-}
-
-.enemy::before,
-.enemy::after {
-
-    content: "";
-
-    position: absolute;
-
-    width: 7px;
-    height: 9px;
-
-    background: white;
-
-    border-radius: 50%;
-
-    top: 9px;
-}
-
-.enemy::before {
-    left: 10px;
-}
-
-.enemy::after {
-    right: 10px;
-}
-
-/* دشمن جنگلی */
-
-.enemy.forest {
-    background:
-        linear-gradient(
-            to bottom,
-            #a66a35,
-            #6d3e20
-        );
-}
-
-/* دشمن حلزون */
-
-.enemy.snail {
-    background:
-        linear-gradient(
-            to bottom,
-            #7b55c7,
-            #48307e
-        );
-}
-
-/* دشمن برفی */
-
-.enemy.snow {
-    background:
-        linear-gradient(
-            to bottom,
-            #ffffff,
-            #9bdcff
-        );
-
-    border-color: #5792b5;
-}
-
-/* دشمن آبی */
-
-.enemy.water {
-    background:
-        linear-gradient(
-            to bottom,
-            #4eb9ff,
-            #1575c4
-        );
-
-    border-color: #09528e;
-}
-
-/* دشمن آتش */
-
-.enemy.fire {
-    background:
-        linear-gradient(
-            to bottom,
-            #ffb000,
-            #e73716
-        );
-
-    border-color: #9e1e0b;
-}
-
-/* =========================
-   BULLET
-========================= */
-
-.bullet {
-    position: absolute;
-
-    width: 16px;
-    height: 9px;
-
-    background: #fff;
-
-    border-radius: 10px;
-
-    box-shadow:
-        0 0 8px #fff;
-
-    z-index: 60;
-}
-
-/* =========================
-   FLAG
-========================= */
-
-.flag {
-    position: absolute;
-
-    width: 12px;
-    height: 100px;
-
-    background: #555;
-
-    z-index: 25;
-}
-
-.flag::after {
-
-    content: "";
-
-    position: absolute;
-
-    left: 10px;
-    top: 5px;
-
-    width: 60px;
-    height: 38px;
-
-    background:
-        linear-gradient(
-            135deg,
-            #ff315f,
-            #d7193f
-        );
-
-    clip-path:
-        polygon(
-            0 0,
-            100% 0,
-            75% 50%,
-            100% 100%,
-            0 100%
-        );
-}
-
-/* =========================
-   BOSS
-========================= */
-
-.boss {
-
-    position: absolute;
-
-    width: 110px;
-    height: 100px;
-
-    border-radius: 50% 50% 35% 35%;
-
-    background:
-        linear-gradient(
-            to bottom,
-            #9a49d8,
-            #4b1d78
-        );
-
-    border: 7px solid #30134f;
-
-    z-index: 35;
-
-    box-shadow:
-        0 10px 0 rgba(0,0,0,0.25);
-}
-
-.boss::before,
-.boss::after {
-
-    content: "";
-
-    position: absolute;
-
-    width: 14px;
-    height: 18px;
-
-    background: white;
-
-    border-radius: 50%;
-
-    top: 25px;
-}
-
-.boss::before {
-    left: 23px;
-}
-
-.boss::after {
-    right: 23px;
-}
-
-/* =========================
-   CAGE
-========================= */
-
-.cage {
-
-    position: absolute;
-
-    width: 100px;
-    height: 120px;
-
-    border: 8px solid #555;
-
-    background:
-        repeating-linear-gradient(
-            90deg,
-            transparent 0,
-            transparent 18px,
-            #555 19px,
-            #555 26px
-        );
-
-    z-index: 25;
-}
-
-.father {
-
-    position: absolute;
-
-    width: 55px;
-    height: 70px;
-
-    left: 22px;
-    top: 30px;
-
-    background: #3577d4;
-
-    border-radius: 15px;
-
-    z-index: 20;
-}
-
-.father::before {
-
-    content: "🙂";
-
-    position: absolute;
-
-    font-size: 30px;
-
-    top: -30px;
-    left: 8px;
-}
-
-/* =========================
-   HUD
-========================= */
-
-#hud {
-
-    position: absolute;
-
-    top: 15px;
     left: 50%;
 
-    transform: translateX(-50%);
+    transform:
+        translateX(-50%);
 
     display: flex;
 
-    gap: 8px;
+    gap: 7px;
 
-    z-index: 200;
+    z-index: 100;
 }
 
-.hud-box {
+.hud-item {
 
-    min-width: 70px;
+    min-width: 65px;
 
-    padding: 9px 12px;
+    padding:
+        8px 10px;
 
-    text-align: center;
+    background:
+        rgba(0,0,0,0.58);
+
+    border:
+        2px solid rgba(255,255,255,0.9);
+
+    border-radius: 14px;
 
     color: white;
 
-    font-size: 15px;
+    text-align: center;
+
+    font-size: 14px;
+
     font-weight: bold;
+
+    backdrop-filter:
+        blur(4px);
+}
+
+
+/* =====================================
+   PAUSE BUTTON
+===================================== */
+
+.pause-button {
+
+    position: absolute;
+
+    top: 12px;
+    right: 15px;
+
+    width: 48px;
+    height: 48px;
+
+    border: 3px solid white;
+
+    border-radius: 50%;
 
     background:
         rgba(0,0,0,0.55);
 
-    border:
-        2px solid rgba(255,255,255,0.8);
-
-    border-radius: 14px;
-}
-
-/* =========================
-   MESSAGE
-========================= */
-
-#message {
-
-    position: absolute;
-
-    left: 50%;
-    top: 42%;
-
-    transform: translate(-50%, -50%);
-
-    z-index: 300;
-
     color: white;
 
-    font-size: 28px;
-    font-weight: bold;
+    font-size: 20px;
 
-    text-align: center;
-
-    text-shadow:
-        3px 3px 5px black;
-
-    pointer-events: none;
+    z-index: 110;
 }
 
-/* =========================
+
+/* =====================================
    MOBILE CONTROLS
-========================= */
+===================================== */
 
 #mobileControls {
 
@@ -643,21 +544,23 @@ body {
 
     left: 0;
     right: 0;
+
     bottom: 15px;
 
     display: flex;
 
     justify-content: space-between;
 
-    padding: 0 18px;
+    padding:
+        0 18px;
 
-    z-index: 500;
+    z-index: 100;
 
     pointer-events: none;
 }
 
-.movement,
-.actions {
+.left-controls,
+.right-controls {
 
     display: flex;
 
@@ -666,81 +569,249 @@ body {
     pointer-events: auto;
 }
 
-.control {
+.game-control {
 
-    width: 64px;
-    height: 64px;
+    width: 68px;
+    height: 68px;
+
+    border:
+        3px solid white;
 
     border-radius: 50%;
-
-    border: 3px solid white;
 
     background:
         rgba(0,0,0,0.55);
 
     color: white;
 
-    font-size: 26px;
+    font-size: 28px;
+
     font-weight: bold;
 
     box-shadow:
-        0 5px 10px rgba(0,0,0,0.35);
+        0 5px 12px rgba(0,0,0,0.35);
 
     touch-action: none;
 }
 
-.control:active {
+.game-control:active {
 
-    transform: scale(0.88);
+    transform:
+        scale(0.88);
+}
+
+.jump-control {
 
     background:
-        rgba(255,255,255,0.35);
+        rgba(30,120,220,0.75);
 }
 
-.jump {
-    background: rgba(30,120,220,0.65);
+.shoot-control {
+
+    background:
+        rgba(210,45,45,0.75);
 }
 
-.shoot {
-    background: rgba(210,50,50,0.7);
+
+/* =====================================
+   GAME MESSAGE
+===================================== */
+
+#gameMessage {
+
+    position: absolute;
+
+    top: 45%;
+    left: 50%;
+
+    transform:
+        translate(-50%, -50%);
+
+    color: white;
+
+    font-size: 30px;
+
+    font-weight: bold;
+
+    text-align: center;
+
+    text-shadow:
+        3px 3px 5px black;
+
+    z-index: 150;
+
+    pointer-events: none;
 }
 
-/* =========================
-   RESPONSIVE
-========================= */
+
+/* =====================================
+   OVERLAY
+===================================== */
+
+.overlay {
+
+    position: absolute;
+
+    inset: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background:
+        rgba(0,0,0,0.65);
+
+    z-index: 500;
+}
+
+.pause-box {
+
+    width: min(380px, 88%);
+
+    padding: 30px 25px;
+
+    border-radius: 25px;
+
+    background:
+        linear-gradient(
+            to bottom,
+            #ffffff,
+            #e7f5ff
+        );
+
+    text-align: center;
+
+    box-shadow:
+        0 15px 40px rgba(0,0,0,0.4);
+}
+
+.pause-box h2 {
+
+    margin-bottom: 20px;
+
+    color: #333;
+
+    font-size: 28px;
+}
+
+.pause-box p {
+
+    margin: 10px;
+
+    font-size: 18px;
+
+    color: #444;
+}
+
+.pause-box button {
+
+    display: block;
+
+    width: 100%;
+
+    margin-top: 12px;
+
+    font-size: 17px;
+}
+
+
+/* =====================================
+   MOBILE
+===================================== */
 
 @media(max-width:600px) {
 
-    #hud {
-
-        width: 96%;
-
-        justify-content: center;
-
-        gap: 4px;
+    .logo-mushroom {
+        font-size: 60px;
     }
 
-    .hud-box {
-
-        min-width: 55px;
-
-        padding: 7px 6px;
-
-        font-size: 12px;
+    .logo h1 {
+        font-size: 39px;
     }
 
-    .control {
+    .logo h2 {
+        font-size: 14px;
+    }
 
+    .menu-buttons {
+        width: 85%;
+        margin-top: 25px;
+    }
+
+    .menu-buttons button {
+        padding: 13px;
+        font-size: 17px;
+    }
+
+    .world-list {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .world-card {
+        min-height: 130px;
+        font-size: 15px;
+    }
+
+    .world-icon {
+        font-size: 45px;
+    }
+
+    #levelList {
+        grid-template-columns:
+            repeat(5, 1fr);
+
+        gap: 7px;
+    }
+
+    .level-button {
+        border-width: 2px;
+        border-radius: 10px;
+        font-size: 17px;
+    }
+
+    .hud-item {
+        min-width: 48px;
+        padding: 6px 5px;
+        font-size: 11px;
+    }
+
+    .game-control {
         width: 58px;
         height: 58px;
-
         font-size: 23px;
     }
 
     #mobileControls {
-
         bottom: 10px;
-
         padding: 0 10px;
+    }
+
+    .pause-button {
+        width: 43px;
+        height: 43px;
+    }
+}
+
+
+/* =====================================
+   VERY SMALL SCREENS
+===================================== */
+
+@media(max-height:500px) {
+
+    .game-control {
+        width: 50px;
+        height: 50px;
+    }
+
+    #mobileControls {
+        bottom: 7px;
+    }
+
+    #gameHud {
+        top: 5px;
     }
 }
