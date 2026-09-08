@@ -11,273 +11,736 @@ body {
     width: 100%;
     height: 100%;
     overflow: hidden;
-    font-family: Arial, sans-serif;
     background: #111;
+    font-family: Arial, sans-serif;
 }
+
+body {
+    touch-action: none;
+}
+
+/* =========================
+   GAME
+========================= */
 
 #game {
     position: relative;
     width: 100vw;
     height: 100vh;
     overflow: hidden;
+}
+
+/* =========================
+   SKY
+========================= */
+
+#sky {
+    position: absolute;
+    inset: 0;
 
     background:
         linear-gradient(
             to bottom,
-            #63c5ff 0%,
-            #b9ecff 60%,
-            #82d65c 60%,
-            #4b9e38 100%
+            #54b9ff 0%,
+            #9de4ff 55%,
+            #d8f7ff 100%
         );
+
+    z-index: 0;
 }
 
-/* ابرهای پس‌زمینه */
-#game::before,
-#game::after {
-    content: "";
+/* =========================
+   WORLD
+========================= */
+
+#world {
     position: absolute;
-    width: 140px;
-    height: 45px;
-    background: rgba(255, 255, 255, 0.85);
-    border-radius: 50px;
-    top: 15%;
+
+    left: 0;
+    top: 0;
+
+    width: 5000px;
+    height: 100%;
+
+    z-index: 5;
+
+    transition: background 0.5s;
 }
 
-#game::before {
-    left: 8%;
-    box-shadow:
-        35px -18px 0 8px rgba(255, 255, 255, 0.85),
-        70px 0 0 2px rgba(255, 255, 255, 0.85);
-}
+/* =========================
+   GROUND
+========================= */
 
-#game::after {
-    right: 8%;
-    top: 28%;
-    transform: scale(0.8);
-}
-
-/* اطلاعات بازی */
-#hud {
+.ground {
     position: absolute;
-    top: 15px;
-    left: 50%;
-    transform: translateX(-50%);
 
-    width: min(92%, 700px);
+    bottom: 0;
 
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    height: 100px;
 
-    padding: 10px 18px;
+    background:
+        linear-gradient(
+            to bottom,
+            #55bd45 0px,
+            #399332 20px,
+            #8a5a32 20px,
+            #704524 100%
+        );
 
-    background: rgba(0, 0, 0, 0.45);
-    border: 2px solid rgba(255, 255, 255, 0.8);
-    border-radius: 16px;
-
-    color: white;
-    font-size: 16px;
-    font-weight: bold;
-
-    backdrop-filter: blur(5px);
-
-    z-index: 100;
+    border-top: 6px solid #287d27;
 }
 
-#hud span {
-    white-space: nowrap;
+/* =========================
+   PLATFORMS
+========================= */
+
+.platform {
+    position: absolute;
+
+    height: 28px;
+
+    background:
+        linear-gradient(
+            to bottom,
+            #69cf51,
+            #3b9631
+        );
+
+    border: 4px solid #286e24;
+
+    border-radius: 10px;
 }
 
-/* کاراکتر */
+/* =========================
+   PLAYER
+========================= */
+
 #player {
     position: absolute;
 
-    left: 80px;
-    bottom: 80px;
-
-    width: 45px;
-    height: 60px;
-
-    background: linear-gradient(
-        to bottom,
-        #ffb6d5,
-        #ff5fa2
-    );
-
-    border: 3px solid #8d2859;
-    border-radius: 22px 22px 12px 12px;
-
-    box-shadow:
-        0 5px 0 rgba(0, 0, 0, 0.25),
-        inset 0 5px 8px rgba(255, 255, 255, 0.35);
+    width: 48px;
+    height: 76px;
 
     z-index: 50;
+
+    transform-origin: center bottom;
 }
 
-/* چشم‌های ساده کاراکتر */
-#player::before {
-    content: "••";
+/* مو */
 
+.hair {
     position: absolute;
-    top: 14px;
-    left: 11px;
 
-    color: #222;
-    font-size: 17px;
-    letter-spacing: 5px;
+    width: 42px;
+    height: 42px;
+
+    left: 3px;
+    top: 0;
+
+    background: #3b2115;
+
+    border-radius:
+        50% 50% 40% 40%;
 }
 
-/* زمین */
-#ground {
+/* صورت */
+
+.face {
     position: absolute;
 
-    left: 0;
-    bottom: 0;
+    width: 32px;
+    height: 34px;
 
-    width: 100%;
-    height: 80px;
+    left: 8px;
+    top: 10px;
+
+    background: #ffd0a5;
+
+    border-radius: 45%;
+
+    border: 2px solid #a8663c;
+
+    z-index: 2;
+}
+
+/* چشم */
+
+.eye {
+    position: absolute;
+
+    width: 4px;
+    height: 6px;
+
+    background: #222;
+
+    border-radius: 50%;
+
+    top: 12px;
+}
+
+.left-eye {
+    left: 8px;
+}
+
+.right-eye {
+    right: 8px;
+}
+
+/* لبخند */
+
+.mouth {
+    position: absolute;
+
+    width: 9px;
+    height: 5px;
+
+    border-bottom: 2px solid #8d493d;
+
+    border-radius: 50%;
+
+    left: 10px;
+    top: 21px;
+}
+
+/* بدن */
+
+.body {
+    position: absolute;
+
+    width: 32px;
+    height: 30px;
+
+    left: 8px;
+    top: 43px;
+
+    background:
+        linear-gradient(
+            to right,
+            #ff4d7d,
+            #e52e60
+        );
+
+    border-radius: 10px 10px 6px 6px;
+
+    border: 2px solid #9e2345;
+}
+
+/* پاها */
+
+.leg {
+    position: absolute;
+
+    width: 11px;
+    height: 15px;
+
+    top: 69px;
+
+    background: #333;
+
+    border-radius: 5px;
+}
+
+.left-leg {
+    left: 10px;
+}
+
+.right-leg {
+    right: 10px;
+}
+
+/* =========================
+   COIN
+========================= */
+
+.coin {
+    position: absolute;
+
+    width: 30px;
+    height: 30px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle at 35% 30%,
+            #fff5a0,
+            #ffd21c 45%,
+            #e49b00 100%
+        );
+
+    border: 3px solid #b97800;
+
+    box-shadow:
+        0 0 10px rgba(255, 200, 0, 0.7);
+
+    z-index: 20;
+
+    animation: coinSpin 0.8s infinite alternate;
+}
+
+@keyframes coinSpin {
+
+    from {
+        transform: scaleX(1);
+    }
+
+    to {
+        transform: scaleX(0.55);
+    }
+}
+
+/* =========================
+   ENEMIES
+========================= */
+
+.enemy {
+    position: absolute;
+
+    width: 50px;
+    height: 45px;
+
+    z-index: 30;
+
+    border-radius: 50% 50% 35% 35%;
+
+    border: 4px solid #4c2d1c;
+}
+
+.enemy::before,
+.enemy::after {
+
+    content: "";
+
+    position: absolute;
+
+    width: 7px;
+    height: 9px;
+
+    background: white;
+
+    border-radius: 50%;
+
+    top: 9px;
+}
+
+.enemy::before {
+    left: 10px;
+}
+
+.enemy::after {
+    right: 10px;
+}
+
+/* دشمن جنگلی */
+
+.enemy.forest {
+    background:
+        linear-gradient(
+            to bottom,
+            #a66a35,
+            #6d3e20
+        );
+}
+
+/* دشمن حلزون */
+
+.enemy.snail {
+    background:
+        linear-gradient(
+            to bottom,
+            #7b55c7,
+            #48307e
+        );
+}
+
+/* دشمن برفی */
+
+.enemy.snow {
+    background:
+        linear-gradient(
+            to bottom,
+            #ffffff,
+            #9bdcff
+        );
+
+    border-color: #5792b5;
+}
+
+/* دشمن آبی */
+
+.enemy.water {
+    background:
+        linear-gradient(
+            to bottom,
+            #4eb9ff,
+            #1575c4
+        );
+
+    border-color: #09528e;
+}
+
+/* دشمن آتش */
+
+.enemy.fire {
+    background:
+        linear-gradient(
+            to bottom,
+            #ffb000,
+            #e73716
+        );
+
+    border-color: #9e1e0b;
+}
+
+/* =========================
+   BULLET
+========================= */
+
+.bullet {
+    position: absolute;
+
+    width: 16px;
+    height: 9px;
+
+    background: #fff;
+
+    border-radius: 10px;
+
+    box-shadow:
+        0 0 8px #fff;
+
+    z-index: 60;
+}
+
+/* =========================
+   FLAG
+========================= */
+
+.flag {
+    position: absolute;
+
+    width: 12px;
+    height: 100px;
+
+    background: #555;
+
+    z-index: 25;
+}
+
+.flag::after {
+
+    content: "";
+
+    position: absolute;
+
+    left: 10px;
+    top: 5px;
+
+    width: 60px;
+    height: 38px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ff315f,
+            #d7193f
+        );
+
+    clip-path:
+        polygon(
+            0 0,
+            100% 0,
+            75% 50%,
+            100% 100%,
+            0 100%
+        );
+}
+
+/* =========================
+   BOSS
+========================= */
+
+.boss {
+
+    position: absolute;
+
+    width: 110px;
+    height: 100px;
+
+    border-radius: 50% 50% 35% 35%;
 
     background:
         linear-gradient(
             to bottom,
-            #63c94b 0 25%,
-            #4d9d37 25% 35%,
-            #805b32 35% 100%
+            #9a49d8,
+            #4b1d78
         );
 
-    border-top: 5px solid #347d29;
+    border: 7px solid #30134f;
 
-    z-index: 40;
+    z-index: 35;
+
+    box-shadow:
+        0 10px 0 rgba(0,0,0,0.25);
 }
 
-/* کنترل‌ها */
-#controls {
+.boss::before,
+.boss::after {
+
+    content: "";
+
     position: absolute;
 
-    left: 0;
-    bottom: 18px;
+    width: 14px;
+    height: 18px;
 
-    width: 100%;
+    background: white;
+
+    border-radius: 50%;
+
+    top: 25px;
+}
+
+.boss::before {
+    left: 23px;
+}
+
+.boss::after {
+    right: 23px;
+}
+
+/* =========================
+   CAGE
+========================= */
+
+.cage {
+
+    position: absolute;
+
+    width: 100px;
+    height: 120px;
+
+    border: 8px solid #555;
+
+    background:
+        repeating-linear-gradient(
+            90deg,
+            transparent 0,
+            transparent 18px,
+            #555 19px,
+            #555 26px
+        );
+
+    z-index: 25;
+}
+
+.father {
+
+    position: absolute;
+
+    width: 55px;
+    height: 70px;
+
+    left: 22px;
+    top: 30px;
+
+    background: #3577d4;
+
+    border-radius: 15px;
+
+    z-index: 20;
+}
+
+.father::before {
+
+    content: "🙂";
+
+    position: absolute;
+
+    font-size: 30px;
+
+    top: -30px;
+    left: 8px;
+}
+
+/* =========================
+   HUD
+========================= */
+
+#hud {
+
+    position: absolute;
+
+    top: 15px;
+    left: 50%;
+
+    transform: translateX(-50%);
 
     display: flex;
-    align-items: center;
 
-    padding: 0 18px;
+    gap: 8px;
 
     z-index: 200;
 }
 
-/* دکمه‌ها */
-#controls button {
-    width: 64px;
-    height: 64px;
+.hud-box {
 
-    border: 3px solid white;
-    border-radius: 50%;
+    min-width: 70px;
 
-    background: rgba(20, 20, 20, 0.55);
+    padding: 9px 12px;
+
+    text-align: center;
 
     color: white;
 
-    font-size: 25px;
+    font-size: 15px;
+    font-weight: bold;
+
+    background:
+        rgba(0,0,0,0.55);
+
+    border:
+        2px solid rgba(255,255,255,0.8);
+
+    border-radius: 14px;
+}
+
+/* =========================
+   MESSAGE
+========================= */
+
+#message {
+
+    position: absolute;
+
+    left: 50%;
+    top: 42%;
+
+    transform: translate(-50%, -50%);
+
+    z-index: 300;
+
+    color: white;
+
+    font-size: 28px;
+    font-weight: bold;
+
+    text-align: center;
+
+    text-shadow:
+        3px 3px 5px black;
+
+    pointer-events: none;
+}
+
+/* =========================
+   MOBILE CONTROLS
+========================= */
+
+#mobileControls {
+
+    position: absolute;
+
+    left: 0;
+    right: 0;
+    bottom: 15px;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    padding: 0 18px;
+
+    z-index: 500;
+
+    pointer-events: none;
+}
+
+.movement,
+.actions {
+
+    display: flex;
+
+    gap: 10px;
+
+    pointer-events: auto;
+}
+
+.control {
+
+    width: 64px;
+    height: 64px;
+
+    border-radius: 50%;
+
+    border: 3px solid white;
+
+    background:
+        rgba(0,0,0,0.55);
+
+    color: white;
+
+    font-size: 26px;
     font-weight: bold;
 
     box-shadow:
-        0 5px 10px rgba(0, 0, 0, 0.3);
+        0 5px 10px rgba(0,0,0,0.35);
 
-    cursor: pointer;
-
-    touch-action: manipulation;
-
-    transition:
-        transform 0.1s,
-        background 0.1s;
+    touch-action: none;
 }
 
-#controls button:active {
+.control:active {
+
     transform: scale(0.88);
-    background: rgba(255, 255, 255, 0.35);
+
+    background:
+        rgba(255,255,255,0.35);
 }
 
-/* دکمه‌های حرکت */
-#leftBtn {
-    margin-right: 7px;
+.jump {
+    background: rgba(30,120,220,0.65);
 }
 
-#rightBtn {
-    margin-right: auto;
+.shoot {
+    background: rgba(210,50,50,0.7);
 }
 
-/* دکمه پرش */
-#jumpBtn {
-    margin-right: 10px;
-}
+/* =========================
+   RESPONSIVE
+========================= */
 
-/* دکمه شلیک */
-#shootBtn {
-    background: rgba(180, 40, 40, 0.65);
-}
-
-/* حالت کامپیوتر */
-@media (min-width: 800px) {
-
-    #controls button {
-        width: 70px;
-        height: 70px;
-    }
+@media(max-width:600px) {
 
     #hud {
-        font-size: 18px;
-    }
-}
 
-/* موبایل */
-@media (max-width: 500px) {
+        width: 96%;
 
-    #hud {
-        top: 10px;
-        width: 94%;
-        padding: 8px 10px;
-        font-size: 13px;
+        justify-content: center;
+
+        gap: 4px;
     }
 
-    #controls {
-        bottom: 12px;
+    .hud-box {
+
+        min-width: 55px;
+
+        padding: 7px 6px;
+
+        font-size: 12px;
+    }
+
+    .control {
+
+        width: 58px;
+        height: 58px;
+
+        font-size: 23px;
+    }
+
+    #mobileControls {
+
+        bottom: 10px;
+
         padding: 0 10px;
-    }
-
-    #controls button {
-        width: 57px;
-        height: 57px;
-        font-size: 22px;
-    }
-
-    #player {
-        width: 40px;
-        height: 55px;
-        left: 60px;
-    }
-
-    #ground {
-        height: 75px;
-    }
-}
-
-/* صفحه خیلی کوچک */
-@media (max-height: 500px) {
-
-    #controls {
-        bottom: 8px;
-    }
-
-    #controls button {
-        width: 50px;
-        height: 50px;
-        font-size: 20px;
-    }
-
-    #hud {
-        top: 5px;
-        padding: 5px 9px;
     }
 }
