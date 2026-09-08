@@ -1,504 +1,1583 @@
-// ==========================================
-// 🍄 ELINA MUSHROOM ADVENTURE
-// 🎮 GAME.JS - VERSION 1
-// ==========================================
+/* ==================================================
+   🍄 ELINA MUSHROOM ADVENTURE
+   🎮 COMPLETE GAME ENGINE
+================================================== */
 
 const game = document.getElementById("game");
+const world = document.getElementById("world");
 const player = document.getElementById("player");
+
+const livesText = document.getElementById("lives");
+const coinsText = document.getElementById("coins");
+const scoreText = document.getElementById("score");
+
+const worldNumberText = document.getElementById("worldNumber");
+const levelNumberText = document.getElementById("levelNumber");
+
+const message = document.getElementById("message");
 
 const leftBtn = document.getElementById("leftBtn");
 const rightBtn = document.getElementById("rightBtn");
 const jumpBtn = document.getElementById("jumpBtn");
 const shootBtn = document.getElementById("shootBtn");
 
-const livesText = document.getElementById("lives");
-const coinsText = document.getElementById("coins");
-const scoreText = document.getElementById("score");
 
-// ==========================================
-// وضعیت بازی
-// ==========================================
+/* ==================================================
+   GAME DATA
+================================================== */
 
-let playerX = 80;
-let playerY = 80;
+const WORLD_NAMES = [
+    "جنگل",
+    "برف",
+    "آب",
+    "آتش"
+];
 
-let velocityY = 0;
+const LEVELS_PER_WORLD = 10;
 
-const speed = 5;
-const jumpPower = 14;
-const gravity = 0.7;
-
-let movingLeft = false;
-let movingRight = false;
-
-let onGround = true;
+let currentWorld = 1;
+let currentLevel = 1;
 
 let lives = 3;
 let coins = 0;
 let score = 0;
 
-let gameOver = false;
+let playerX = 100;
+let playerY = 100;
 
-// ==========================================
-// تنظیم اولیه بازیکن
-// ==========================================
+let velocityY = 0;
 
-function updatePlayer() {
-    player.style.left = playerX + "px";
-    player.style.bottom = playerY + "px";
+const gravity = 0.75;
+const moveSpeed = 5.5;
+const jumpPower = 15;
+
+let movingLeft = false;
+let movingRight = false;
+
+let facing = 1;
+
+let onGround = true;
+
+let gameRunning = true;
+
+let invincible = false;
+
+let cameraX = 0;
+
+let objects = [];
+
+let levelWidth = 5000;
+
+
+/* ==================================================
+   LEVEL SETTINGS
+================================================== */
+
+const worldSettings = {
+
+    1: {
+        className: "forest",
+        sky:
+            "linear-gradient(to bottom,#52baff 0%,#a5e8ff 55%,#d9f7ff 100%)"
+    },
+
+    2: {
+        className: "snow",
+        sky:
+            "linear-gradient(to bottom,#6ec7ff 0%,#e9f8ff 60%,#ffffff 100%)"
+    },
+
+    3: {
+        className: "water",
+        sky:
+            "linear-gradient(to bottom,#2499e8 0%,#83dcff 60%,#4fc3e8 100%)"
+    },
+
+    4: {
+        className: "fire",
+        sky:
+            "linear-gradient(to bottom,#42132a 0%,#b72d23 55%,#ff701d 100%)"
+    }
+
+};
+
+
+/* ==================================================
+   UTILITY
+================================================== */
+
+function createElement(className) {
+
+    const element = document.createElement("div");
+
+    element.className = className;
+
+    world.appendChild(element);
+
+    return element;
 }
 
-// ==========================================
-// حرکت بازیکن
-// ==========================================
+
+function clearLevel() {
+
+    objects.forEach(object => {
+
+        if (object.element) {
+
+            object.element.remove();
+
+        }
+
+    });
+
+    objects = [];
+
+}
+
+
+/* ==================================================
+   GROUND
+================================================== */
+
+function createGround() {
+
+    const ground = createElement("ground");
+
+    ground.style.left = "0px";
+    ground.style.width = levelWidth + "px";
+
+    objects.push({
+        type: "ground",
+        element: ground,
+        x: 0,
+        y: 0,
+        width: levelWidth,
+        height: 100
+    });
+
+}
+
+
+/* ==================================================
+   PLATFORM
+================================================== */
+
+function createPlatform(x, y, width) {
+
+    const element = createElement("platform");
+
+    element.style.left = x + "px";
+    element.style.bottom = y + "px";
+    element.style.width = width + "px";
+
+    objects.push({
+
+        type: "platform",
+
+        element: element,
+
+        x: x,
+        y: y,
+        width: width,
+        height: 28
+
+    });
+
+}
+
+
+/* ==================================================
+   COIN
+================================================== */
+
+function createCoin(x, y) {
+
+    const element = createElement("coin");
+
+    element.style.left = x + "px";
+    element.style.bottom = y + "px";
+
+    objects.push({
+
+        type: "coin",
+
+        element: element,
+
+        x: x,
+        y: y,
+
+        width: 30,
+        height: 30,
+
+        collected: false
+
+    });
+
+}
+
+
+/* ==================================================
+   ENEMY
+================================================== */
+
+function createEnemy(x, y, type) {
+
+    const element = createElement("enemy " + type);
+
+    element.style.left = x + "px";
+    element.style.bottom = y + "px";
+
+    objects.push({
+
+        type: "enemy",
+
+        enemyType: type,
+
+        element: element,
+
+        x: x,
+        y: y,
+
+        width: 50,
+        height: 45,
+
+        direction: -1,
+
+        startX: x,
+
+        minX: x - 100,
+
+        maxX: x + 100,
+
+        alive: true
+
+    });
+
+}
+
+
+/* ==================================================
+   FLAG
+================================================== */
+
+function createFlag(x) {
+
+    const element = createElement("flag");
+
+    element.style.left = x + "px";
+    element.style.bottom = "100px";
+
+    objects.push({
+
+        type: "flag",
+
+        element: element,
+
+        x: x,
+        y: 100,
+
+        width: 70,
+        height: 100
+
+    });
+
+}
+
+
+/* ==================================================
+   BOSS
+================================================== */
+
+function createBoss(x) {
+
+    const element = createElement("boss");
+
+    element.style.left = x + "px";
+    element.style.bottom = "100px";
+
+    objects.push({
+
+        type: "boss",
+
+        element: element,
+
+        x: x,
+        y: 100,
+
+        width: 110,
+        height: 100,
+
+        health: 5,
+
+        direction: -1,
+
+        startX: x,
+
+        alive: true
+
+    });
+
+}
+
+
+/* ==================================================
+   FATHER + CAGE
+================================================== */
+
+function createFather(x) {
+
+    const cage = createElement("cage");
+
+    cage.style.left = x + "px";
+    cage.style.bottom = "100px";
+
+    const father = document.createElement("div");
+
+    father.className = "father";
+
+    cage.appendChild(father);
+
+    objects.push({
+
+        type: "cage",
+
+        element: cage,
+
+        x: x,
+
+        y: 100,
+
+        width: 100,
+
+        height: 120
+
+    });
+
+}
+
+
+/* ==================================================
+   BUILD LEVEL
+================================================== */
+
+function buildLevel() {
+
+    clearLevel();
+
+    levelWidth = 5000;
+
+    world.style.width = levelWidth + "px";
+
+    createGround();
+
+    /* -----------------------------
+       پلتفرم‌ها
+    ----------------------------- */
+
+    for (let i = 0; i < 12; i++) {
+
+        const x = 400 + i * 350;
+
+        const y =
+            160 +
+            (i % 3) * 60;
+
+        createPlatform(
+            x,
+            y,
+            160
+        );
+
+    }
+
+
+    /* -----------------------------
+       سکه‌ها
+    ----------------------------- */
+
+    for (let i = 0; i < 25; i++) {
+
+        const x =
+            250 +
+            i * 180;
+
+        const y =
+            140 +
+            (i % 4) * 55;
+
+        createCoin(
+            x,
+            y
+        );
+
+    }
+
+
+    /* -----------------------------
+       دشمن‌ها
+    ----------------------------- */
+
+    const enemyType =
+        worldSettings[currentWorld].className;
+
+    for (let i = 0; i < 12; i++) {
+
+        createEnemy(
+            600 + i * 330,
+            100,
+            enemyType
+        );
+
+    }
+
+
+    /* -----------------------------
+       پرچم
+    ----------------------------- */
+
+    createFlag(
+        levelWidth - 400
+    );
+
+
+    /* -----------------------------
+       باس
+    ----------------------------- */
+
+    if (currentLevel === 10) {
+
+        createBoss(
+            levelWidth - 700
+        );
+
+        createFather(
+            levelWidth - 180
+        );
+
+    }
+
+
+    /* -----------------------------
+       موقعیت بازیکن
+    ----------------------------- */
+
+    playerX = 100;
+    playerY = 100;
+
+    velocityY = 0;
+
+    onGround = true;
+
+    cameraX = 0;
+
+    updatePlayer();
+
+    updateHUD();
+
+    setWorldBackground();
+
+}
+
+
+/* ==================================================
+   WORLD BACKGROUND
+================================================== */
+
+function setWorldBackground() {
+
+    const sky =
+        document.getElementById("sky");
+
+    sky.style.background =
+        worldSettings[currentWorld].sky;
+
+}
+
+
+/* ==================================================
+   PLAYER
+================================================== */
+
+function updatePlayer() {
+
+    player.style.left =
+        playerX + "px";
+
+    player.style.bottom =
+        playerY + "px";
+
+    if (facing === -1) {
+
+        player.style.transform =
+            "scaleX(-1)";
+
+    } else {
+
+        player.style.transform =
+            "scaleX(1)";
+
+    }
+
+}
+
+
+/* ==================================================
+   PLAYER RECT
+================================================== */
+
+function playerRect() {
+
+    return {
+
+        left: playerX,
+
+        right:
+            playerX +
+            player.offsetWidth,
+
+        bottom: playerY,
+
+        top:
+            playerY +
+            player.offsetHeight
+
+    };
+
+}
+
+
+/* ==================================================
+   COLLISION
+================================================== */
+
+function isColliding(a, b) {
+
+    return (
+
+        a.left < b.right &&
+        a.right > b.left &&
+        a.bottom < b.top &&
+        a.top > b.bottom
+
+    );
+
+}
+
+
+/* ==================================================
+   MOVE PLAYER
+================================================== */
 
 function movePlayer() {
 
+    if (!gameRunning)
+        return;
+
+
     if (movingLeft) {
-        playerX -= speed;
+
+        playerX -= moveSpeed;
+
+        facing = -1;
+
     }
+
 
     if (movingRight) {
-        playerX += speed;
+
+        playerX += moveSpeed;
+
+        facing = 1;
+
     }
 
-    // جلوگیری از خروج بازیکن از صفحه
-    const maxX = game.clientWidth - player.offsetWidth;
 
     if (playerX < 0) {
+
         playerX = 0;
+
     }
 
-    if (playerX > maxX) {
-        playerX = maxX;
+
+    if (playerX >
+        levelWidth -
+        player.offsetWidth) {
+
+        playerX =
+            levelWidth -
+            player.offsetWidth;
+
     }
+
 
     updatePlayer();
+
 }
 
-// ==========================================
-// پرش
-// ==========================================
 
-function jump() {
-
-    if (!onGround || gameOver) {
-        return;
-    }
-
-    velocityY = jumpPower;
-    onGround = false;
-}
-
-// ==========================================
-// گرانش
-// ==========================================
+/* ==================================================
+   GRAVITY
+================================================== */
 
 function applyGravity() {
 
-    if (onGround) {
+    if (onGround)
         return;
-    }
+
 
     velocityY -= gravity;
+
     playerY += velocityY;
 
-    // برخورد با زمین
-    if (playerY <= 80) {
-        playerY = 80;
+
+    if (playerY <= 100) {
+
+        playerY = 100;
+
         velocityY = 0;
+
         onGround = true;
+
     }
+
+
+    /* برخورد با پلتفرم */
+
+    const pRect = playerRect();
+
+    for (const obj of objects) {
+
+        if (
+            obj.type !== "platform"
+        )
+            continue;
+
+
+        const platformRect = {
+
+            left: obj.x,
+
+            right:
+                obj.x +
+                obj.width,
+
+            bottom: obj.y,
+
+            top:
+                obj.y +
+                obj.height
+
+        };
+
+
+        if (
+
+            pRect.right >
+            platformRect.left &&
+
+            pRect.left <
+            platformRect.right &&
+
+            pRect.bottom <=
+            platformRect.top + 15 &&
+
+            pRect.bottom >=
+            platformRect.bottom &&
+
+            velocityY <= 0
+
+        ) {
+
+            playerY =
+                platformRect.top;
+
+            velocityY = 0;
+
+            onGround = true;
+
+        }
+
+    }
+
 
     updatePlayer();
+
 }
 
-// ==========================================
-// کنترل دکمه چپ
-// ==========================================
 
-function leftStart(event) {
-    if (event) event.preventDefault();
-    movingLeft = true;
+/* ==================================================
+   JUMP
+================================================== */
+
+function jump() {
+
+    if (!gameRunning)
+        return;
+
+    if (!onGround)
+        return;
+
+
+    velocityY =
+        jumpPower;
+
+    onGround = false;
+
 }
 
-function leftStop(event) {
-    if (event) event.preventDefault();
-    movingLeft = false;
-}
 
-leftBtn.addEventListener("mousedown", leftStart);
-leftBtn.addEventListener("mouseup", leftStop);
-leftBtn.addEventListener("mouseleave", leftStop);
+/* ==================================================
+   COINS
+================================================== */
 
-leftBtn.addEventListener("touchstart", leftStart, {
-    passive: false
-});
+function checkCoins() {
 
-leftBtn.addEventListener("touchend", leftStop, {
-    passive: false
-});
+    const p = playerRect();
 
-// ==========================================
-// کنترل دکمه راست
-// ==========================================
+    for (const obj of objects) {
 
-function rightStart(event) {
-    if (event) event.preventDefault();
-    movingRight = true;
-}
+        if (
+            obj.type !== "coin" ||
+            obj.collected
+        )
+            continue;
 
-function rightStop(event) {
-    if (event) event.preventDefault();
-    movingRight = false;
-}
 
-rightBtn.addEventListener("mousedown", rightStart);
-rightBtn.addEventListener("mouseup", rightStop);
-rightBtn.addEventListener("mouseleave", rightStop);
+        const c = {
 
-rightBtn.addEventListener("touchstart", rightStart, {
-    passive: false
-});
+            left: obj.x,
 
-rightBtn.addEventListener("touchend", rightStop, {
-    passive: false
-});
+            right:
+                obj.x +
+                obj.width,
 
-// ==========================================
-// دکمه پرش
-// ==========================================
+            bottom: obj.y,
 
-jumpBtn.addEventListener("click", jump);
+            top:
+                obj.y +
+                obj.height
 
-jumpBtn.addEventListener("touchstart", function(event) {
-    event.preventDefault();
-    jump();
-}, {
-    passive: false
-});
+        };
 
-// ==========================================
-// کنترل کیبورد
-// ==========================================
 
-document.addEventListener("keydown", function(event) {
+        if (isColliding(p, c)) {
 
-    if (
-        event.key === "ArrowLeft" ||
-        event.key.toLowerCase() === "a"
-    ) {
-        movingLeft = true;
-    }
+            obj.collected = true;
 
-    if (
-        event.key === "ArrowRight" ||
-        event.key.toLowerCase() === "d"
-    ) {
-        movingRight = true;
-    }
+            obj.element.remove();
 
-    if (
-        event.key === "ArrowUp" ||
-        event.key === " " ||
-        event.key.toLowerCase() === "w"
-    ) {
-        jump();
-    }
-});
+            coins++;
 
-document.addEventListener("keyup", function(event) {
+            score += 100;
 
-    if (
-        event.key === "ArrowLeft" ||
-        event.key.toLowerCase() === "a"
-    ) {
-        movingLeft = false;
-    }
+            updateHUD();
 
-    if (
-        event.key === "ArrowRight" ||
-        event.key.toLowerCase() === "d"
-    ) {
-        movingRight = false;
-    }
-});
-
-// ==========================================
-// سکه
-// ==========================================
-
-const coin = document.createElement("div");
-
-coin.style.position = "absolute";
-coin.style.width = "25px";
-coin.style.height = "25px";
-coin.style.borderRadius = "50%";
-coin.style.background = "gold";
-coin.style.border = "3px solid #d99b00";
-coin.style.left = "300px";
-coin.style.bottom = "100px";
-coin.style.zIndex = "30";
-
-game.appendChild(coin);
-
-// ==========================================
-// جمع کردن سکه
-// ==========================================
-
-function collectCoin() {
-
-    const playerRect = player.getBoundingClientRect();
-    const coinRect = coin.getBoundingClientRect();
-
-    if (
-        playerRect.left < coinRect.right &&
-        playerRect.right > coinRect.left &&
-        playerRect.top < coinRect.bottom &&
-        playerRect.bottom > coinRect.top
-    ) {
-
-        coin.remove();
-
-        coins++;
-        score += 100;
-
-        updateHUD();
-    }
-}
-
-// ==========================================
-// دشمن
-// ==========================================
-
-const enemy = document.createElement("div");
-
-enemy.style.position = "absolute";
-enemy.style.width = "45px";
-enemy.style.height = "40px";
-enemy.style.left = "550px";
-enemy.style.bottom = "80px";
-enemy.style.background = "#6b4b2a";
-enemy.style.borderRadius = "50% 50% 35% 35%";
-enemy.style.border = "3px solid #3e2918";
-enemy.style.zIndex = "30";
-
-game.appendChild(enemy);
-
-let enemyDirection = -1;
-let enemyX = 550;
-
-// ==========================================
-// حرکت دشمن
-// ==========================================
-
-function moveEnemy() {
-
-    enemyX += enemyDirection * 2;
-
-    if (enemyX <= 400) {
-        enemyDirection = 1;
-    }
-
-    if (enemyX >= 650) {
-        enemyDirection = -1;
-    }
-
-    enemy.style.left = enemyX + "px";
-}
-
-// ==========================================
-// برخورد با دشمن
-// ==========================================
-
-function checkEnemyCollision() {
-
-    const playerRect = player.getBoundingClientRect();
-    const enemyRect = enemy.getBoundingClientRect();
-
-    if (
-        playerRect.left < enemyRect.right &&
-        playerRect.right > enemyRect.left &&
-        playerRect.top < enemyRect.bottom &&
-        playerRect.bottom > enemyRect.top
-    ) {
-
-        lives--;
-
-        score = Math.max(0, score - 50);
-
-        playerX = 80;
-        playerY = 80;
-
-        updateHUD();
-
-        if (lives <= 0) {
-            endGame();
         }
+
     }
+
 }
 
-// ==========================================
-// شلیک
-// ==========================================
+
+/* ==================================================
+   ENEMY MOVEMENT
+================================================== */
+
+function moveEnemies() {
+
+    for (const obj of objects) {
+
+        if (
+            obj.type !== "enemy" ||
+            !obj.alive
+        )
+            continue;
+
+
+        obj.x +=
+            obj.direction * 1.5;
+
+
+        if (obj.x <= obj.minX) {
+
+            obj.direction = 1;
+
+        }
+
+
+        if (obj.x >= obj.maxX) {
+
+            obj.direction = -1;
+
+        }
+
+
+        obj.element.style.left =
+            obj.x + "px";
+
+    }
+
+}
+
+
+/* ==================================================
+   ENEMY COLLISION
+================================================== */
+
+function checkEnemies() {
+
+    if (invincible)
+        return;
+
+
+    const p =
+        playerRect();
+
+
+    for (const obj of objects) {
+
+        if (
+            obj.type !== "enemy" ||
+            !obj.alive
+        )
+            continue;
+
+
+        const e = {
+
+            left: obj.x,
+
+            right:
+                obj.x +
+                obj.width,
+
+            bottom: obj.y,
+
+            top:
+                obj.y +
+                obj.height
+
+        };
+
+
+        if (isColliding(p, e)) {
+
+            loseLife();
+
+            return;
+
+        }
+
+    }
+
+}
+
+
+/* ==================================================
+   LOSE LIFE
+================================================== */
+
+function loseLife() {
+
+    if (invincible)
+        return;
+
+
+    lives--;
+
+    updateHUD();
+
+
+    invincible = true;
+
+    player.style.opacity =
+        "0.45";
+
+
+    setTimeout(() => {
+
+        invincible = false;
+
+        player.style.opacity =
+            "1";
+
+    }, 1500);
+
+
+    playerX = 100;
+
+    playerY = 100;
+
+    velocityY = 0;
+
+    cameraX = 0;
+
+    updatePlayer();
+
+
+    if (lives <= 0) {
+
+        gameOver();
+
+    }
+
+}
+
+
+/* ==================================================
+   SHOOT
+================================================== */
 
 function shoot() {
 
-    if (gameOver) {
+    if (!gameRunning)
         return;
-    }
 
-    const bullet = document.createElement("div");
 
-    bullet.style.position = "absolute";
-    bullet.style.width = "14px";
-    bullet.style.height = "7px";
-    bullet.style.background = "white";
-    bullet.style.borderRadius = "10px";
-    bullet.style.left = (playerX + 45) + "px";
-    bullet.style.bottom = (playerY + 25) + "px";
-    bullet.style.zIndex = "40";
+    const bullet =
+        document.createElement("div");
 
-    game.appendChild(bullet);
+    bullet.className =
+        "bullet";
 
-    let bulletX = playerX + 45;
 
-    const bulletTimer = setInterval(function() {
+    let bulletX =
+        playerX +
+        (facing === 1 ? 45 : -15);
 
-        bulletX += 9;
+    let bulletY =
+        playerY + 40;
 
-        bullet.style.left = bulletX + "px";
 
-        // برخورد تیر با دشمن
-        const bulletRect = bullet.getBoundingClientRect();
-        const enemyRect = enemy.getBoundingClientRect();
+    bullet.style.left =
+        bulletX + "px";
 
-        if (
-            bulletRect.left < enemyRect.right &&
-            bulletRect.right > enemyRect.left &&
-            bulletRect.top < enemyRect.bottom &&
-            bulletRect.bottom > enemyRect.top
-        ) {
+    bullet.style.bottom =
+        bulletY + "px";
 
-            clearInterval(bulletTimer);
 
-            bullet.remove();
+    world.appendChild(
+        bullet
+    );
 
-            enemyX = 700;
-            score += 200;
 
-            updateHUD();
-        }
+    const bulletSpeed =
+        facing === 1 ? 11 : -11;
 
-        // خروج تیر از صفحه
-        if (bulletX > game.clientWidth) {
 
-            clearInterval(bulletTimer);
+    const timer =
+        setInterval(() => {
 
-            bullet.remove();
-        }
+            bulletX +=
+                bulletSpeed;
 
-    }, 20);
+
+            bullet.style.left =
+                bulletX + "px";
+
+
+            /* برخورد با دشمن */
+
+            for (const obj of objects) {
+
+                if (
+                    obj.type === "enemy" &&
+                    obj.alive
+                ) {
+
+                    if (
+
+                        bulletX <
+                        obj.x +
+                        obj.width &&
+
+                        bulletX +
+                        16 >
+                        obj.x
+
+                    ) {
+
+                        obj.alive =
+                            false;
+
+                        obj.element.remove();
+
+                        clearInterval(timer);
+
+                        bullet.remove();
+
+                        score += 200;
+
+                        updateHUD();
+
+                        return;
+
+                    }
+
+                }
+
+
+                /* برخورد با باس */
+
+                if (
+                    obj.type === "boss" &&
+                    obj.alive
+                ) {
+
+                    if (
+
+                        bulletX <
+                        obj.x +
+                        obj.width &&
+
+                        bulletX +
+                        16 >
+                        obj.x
+
+                    ) {
+
+                        obj.health--;
+
+                        clearInterval(timer);
+
+                        bullet.remove();
+
+
+                        if (
+                            obj.health <= 0
+                        ) {
+
+                            obj.alive =
+                                false;
+
+                            obj.element.remove();
+
+                            score += 2000;
+
+                            updateHUD();
+
+                            showMessage(
+                                "👑 باس شکست خورد!"
+                            );
+
+                        }
+
+                        return;
+
+                    }
+
+                }
+
+            }
+
+
+            if (
+                bulletX < -100 ||
+                bulletX > levelWidth + 100
+            ) {
+
+                clearInterval(timer);
+
+                bullet.remove();
+
+            }
+
+        }, 20);
+
 }
 
-shootBtn.addEventListener("click", shoot);
 
-shootBtn.addEventListener("touchstart", function(event) {
-    event.preventDefault();
-    shoot();
-}, {
-    passive: false
-});
+/* ==================================================
+   FLAG / LEVEL END
+================================================== */
 
-// ==========================================
-// HUD
-// ==========================================
+function checkFlag() {
+
+    const p =
+        playerRect();
+
+
+    for (const obj of objects) {
+
+        if (
+            obj.type !== "flag"
+        )
+            continue;
+
+
+        const flagRect = {
+
+            left: obj.x,
+
+            right:
+                obj.x +
+                obj.width,
+
+            bottom: 100,
+
+            top: 200
+
+        };
+
+
+        if (
+            isColliding(
+                p,
+                flagRect
+            )
+        ) {
+
+
+            if (
+                currentLevel === 10
+            ) {
+
+                const bossAlive =
+                    objects.some(
+                        o =>
+                            o.type === "boss" &&
+                            o.alive
+                    );
+
+
+                if (bossAlive) {
+
+                    showMessage(
+                        "👑 اول باس را شکست بده!"
+                    );
+
+                    return;
+
+                }
+
+            }
+
+
+            nextLevel();
+
+            return;
+
+        }
+
+    }
+
+}
+
+
+/* ==================================================
+   NEXT LEVEL
+================================================== */
+
+function nextLevel() {
+
+    currentLevel++;
+
+
+    if (
+        currentLevel >
+        LEVELS_PER_WORLD
+    ) {
+
+        currentLevel = 1;
+
+        currentWorld++;
+
+
+        if (
+            currentWorld > 4
+        ) {
+
+            winGame();
+
+            return;
+
+        }
+
+    }
+
+
+    showMessage(
+        "مرحله بعدی! 🚩"
+    );
+
+
+    setTimeout(() => {
+
+        buildLevel();
+
+    }, 900);
+
+}
+
+
+/* ==================================================
+   CAMERA
+================================================== */
+
+function updateCamera() {
+
+    const screenWidth =
+        game.clientWidth;
+
+
+    const target =
+        playerX -
+        screenWidth * 0.35;
+
+
+    cameraX +=
+        (target - cameraX) *
+        0.12;
+
+
+    if (cameraX < 0)
+        cameraX = 0;
+
+
+    const maxCamera =
+        levelWidth -
+        screenWidth;
+
+
+    if (
+        cameraX >
+        maxCamera
+    ) {
+
+        cameraX =
+            maxCamera;
+
+    }
+
+
+    if (cameraX < 0)
+        cameraX = 0;
+
+
+    world.style.transform =
+        `translateX(${-cameraX}px)`;
+
+}
+
+
+/* ==================================================
+   HUD
+================================================== */
 
 function updateHUD() {
 
-    livesText.textContent = lives;
-    coinsText.textContent = coins;
-    scoreText.textContent = score;
+    livesText.textContent =
+        lives;
+
+    coinsText.textContent =
+        coins;
+
+    scoreText.textContent =
+        score;
+
+    worldNumberText.textContent =
+        currentWorld;
+
+    levelNumberText.textContent =
+        currentLevel;
+
 }
 
-// ==========================================
-// پایان بازی
-// ==========================================
 
-function endGame() {
+/* ==================================================
+   MESSAGE
+================================================== */
 
-    gameOver = true;
+function showMessage(text) {
 
-    const message = document.createElement("div");
+    message.textContent =
+        text;
 
-    message.id = "gameOverMessage";
 
-    message.style.position = "absolute";
-    message.style.left = "50%";
-    message.style.top = "50%";
-    message.style.transform = "translate(-50%, -50%)";
+    setTimeout(() => {
 
-    message.style.padding = "25px 35px";
+        message.textContent =
+            "";
 
-    message.style.background = "rgba(0,0,0,0.85)";
-    message.style.color = "white";
+    }, 1500);
 
-    message.style.borderRadius = "20px";
+}
 
-    message.style.textAlign = "center";
-    message.style.fontSize = "24px";
-    message.style.fontWeight = "bold";
 
-    message.style.zIndex = "500";
+/* ==================================================
+   GAME OVER
+================================================== */
 
-    message.innerHTML = `
-        💔 بازی تمام شد!
+function gameOver() {
+
+    gameRunning = false;
+
+    message.innerHTML =
+
+        `💔 بازی تمام شد!
         <br>
         <small>امتیاز: ${score}</small>
         <br><br>
-        <button onclick="location.reload()"
-        style="
-        padding:10px 20px;
-        border:none;
-        border-radius:10px;
-        font-size:18px;
-        cursor:pointer;
-        ">
+        <button onclick="location.reload()">
         دوباره بازی
-        </button>
-    `;
+        </button>`;
 
-    game.appendChild(message);
 }
 
-// ==========================================
-// حلقه اصلی بازی
-// ==========================================
+
+/* ==================================================
+   WIN
+================================================== */
+
+function winGame() {
+
+    gameRunning = false;
+
+    message.innerHTML =
+
+        `🏆 تبریک الینا!
+        <br>
+        🎉 تمام دنیاها را کامل کردی!
+        <br>
+        👨‍👧 پدرت را نجات دادی!
+        <br><br>
+        ⭐ امتیاز: ${score}
+        <br>
+        🪙 سکه: ${coins}`;
+
+}
+
+
+/* ==================================================
+   KEYBOARD
+================================================== */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key === "ArrowLeft" ||
+            event.key.toLowerCase() === "a"
+        ) {
+
+            movingLeft = true;
+
+        }
+
+
+        if (
+            event.key === "ArrowRight" ||
+            event.key.toLowerCase() === "d"
+        ) {
+
+            movingRight = true;
+
+        }
+
+
+        if (
+            event.key === "ArrowUp" ||
+            event.key === " " ||
+            event.key.toLowerCase() === "w"
+        ) {
+
+            jump();
+
+        }
+
+
+        if (
+            event.key.toLowerCase() === "f"
+        ) {
+
+            shoot();
+
+        }
+
+    }
+);
+
+
+document.addEventListener(
+    "keyup",
+    event => {
+
+        if (
+            event.key === "ArrowLeft" ||
+            event.key.toLowerCase() === "a"
+        ) {
+
+            movingLeft = false;
+
+        }
+
+
+        if (
+            event.key === "ArrowRight" ||
+            event.key.toLowerCase() === "d"
+        ) {
+
+            movingRight = false;
+
+        }
+
+    }
+);
+
+
+/* ==================================================
+   TOUCH CONTROLS
+================================================== */
+
+function holdButton(
+    button,
+    start,
+    stop
+) {
+
+    button.addEventListener(
+        "pointerdown",
+        event => {
+
+            event.preventDefault();
+
+            start();
+
+        }
+    );
+
+
+    button.addEventListener(
+        "pointerup",
+        event => {
+
+            event.preventDefault();
+
+            stop();
+
+        }
+    );
+
+
+    button.addEventListener(
+        "pointercancel",
+        stop
+    );
+
+
+    button.addEventListener(
+        "pointerleave",
+        stop
+    );
+
+}
+
+
+/* حرکت چپ */
+
+holdButton(
+
+    leftBtn,
+
+    () => {
+        movingLeft = true;
+    },
+
+    () => {
+        movingLeft = false;
+    }
+
+);
+
+
+/* حرکت راست */
+
+holdButton(
+
+    rightBtn,
+
+    () => {
+        movingRight = true;
+    },
+
+    () => {
+        movingRight = false;
+    }
+
+);
+
+
+/* پرش */
+
+jumpBtn.addEventListener(
+    "pointerdown",
+    event => {
+
+        event.preventDefault();
+
+        jump();
+
+    }
+);
+
+
+/* شلیک */
+
+shootBtn.addEventListener(
+    "pointerdown",
+    event => {
+
+        event.preventDefault();
+
+        shoot();
+
+    }
+);
+
+
+/* ==================================================
+   GAME LOOP
+================================================== */
 
 function gameLoop() {
 
-    if (!gameOver) {
+    if (gameRunning) {
 
         movePlayer();
+
         applyGravity();
 
-        moveEnemy();
+        moveEnemies();
 
-        collectCoin();
+        checkCoins();
 
-        checkEnemyCollision();
+        checkEnemies();
+
+        checkFlag();
+
+        updateCamera();
+
     }
 
-    requestAnimationFrame(gameLoop);
+
+    requestAnimationFrame(
+        gameLoop
+    );
+
 }
 
-// ==========================================
-// شروع بازی
-// ==========================================
 
-updatePlayer();
+/* ==================================================
+   START
+================================================== */
+
+buildLevel();
+
 updateHUD();
 
 gameLoop();
 
-console.log("🍄 Elina Mushroom Adventure is running!");
+console.log(
+    "🍄 Elina Mushroom Adventure loaded successfully!"
+);
