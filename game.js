@@ -1,9 +1,8 @@
-// ======================================
+// ==========================================
 // 🍄 ELINA MUSHROOM ADVENTURE
-// 🎮 Game Engine - Version 1
-// ======================================
+// 🎮 GAME.JS - VERSION 1
+// ==========================================
 
-// ---------- عناصر بازی ----------
 const game = document.getElementById("game");
 const player = document.getElementById("player");
 
@@ -16,88 +15,187 @@ const livesText = document.getElementById("lives");
 const coinsText = document.getElementById("coins");
 const scoreText = document.getElementById("score");
 
-// ---------- وضعیت بازی ----------
-const state = {
-    x: 80,
-    y: 80,
+// ==========================================
+// وضعیت بازی
+// ==========================================
 
-    velocityX: 0,
-    velocityY: 0,
+let playerX = 80;
+let playerY = 80;
 
-    speed: 5,
-    jumpPower: 14,
-    gravity: 0.7,
+let velocityY = 0;
 
-    onGround: true,
+const speed = 5;
+const jumpPower = 14;
+const gravity = 0.7;
 
-    lives: 3,
-    coins: 0,
-    score: 0,
+let movingLeft = false;
+let movingRight = false;
 
-    movingLeft: false,
-    movingRight: false
-};
+let onGround = true;
 
-// ---------- اندازه زمین ----------
-const groundHeight = 80;
+let lives = 3;
+let coins = 0;
+let score = 0;
 
-// ---------- کنترل حرکت ----------
+let gameOver = false;
 
-function startLeft() {
-    state.movingLeft = true;
+// ==========================================
+// تنظیم اولیه بازیکن
+// ==========================================
+
+function updatePlayer() {
+    player.style.left = playerX + "px";
+    player.style.bottom = playerY + "px";
 }
 
-function stopLeft() {
-    state.movingLeft = false;
-}
+// ==========================================
+// حرکت بازیکن
+// ==========================================
 
-function startRight() {
-    state.movingRight = true;
-}
+function movePlayer() {
 
-function stopRight() {
-    state.movingRight = false;
-}
-
-// ---------- حرکت چپ ----------
-leftBtn.addEventListener("touchstart", (event) => {
-    event.preventDefault();
-    startLeft();
-});
-
-leftBtn.addEventListener("touchend", (event) => {
-    event.preventDefault();
-    stopLeft();
-});
-
-leftBtn.addEventListener("mousedown", startLeft);
-leftBtn.addEventListener("mouseup", stopLeft);
-leftBtn.addEventListener("mouseleave", stopLeft);
-
-// ---------- حرکت راست ----------
-rightBtn.addEventListener("touchstart", (event) => {
-    event.preventDefault();
-    startRight();
-});
-
-rightBtn.addEventListener("touchend", (event) => {
-    event.preventDefault();
-    stopRight();
-});
-
-rightBtn.addEventListener("mousedown", startRight);
-rightBtn.addEventListener("mouseup", stopRight);
-rightBtn.addEventListener("mouseleave", stopRight);
-
-// ---------- کیبورد ----------
-document.addEventListener("keydown", (event) => {
-
-    if (event.key === "ArrowLeft" || event.key.toLowerCase() === "a") {
-        state.movingLeft = true;
+    if (movingLeft) {
+        playerX -= speed;
     }
 
-    if (event.key === "ArrowRight" || event.key.toLowerCase() === "d") {
-        state.movingRight = true;
+    if (movingRight) {
+        playerX += speed;
+    }
+
+    // جلوگیری از خروج بازیکن از صفحه
+    const maxX = game.clientWidth - player.offsetWidth;
+
+    if (playerX < 0) {
+        playerX = 0;
+    }
+
+    if (playerX > maxX) {
+        playerX = maxX;
+    }
+
+    updatePlayer();
+}
+
+// ==========================================
+// پرش
+// ==========================================
+
+function jump() {
+
+    if (!onGround || gameOver) {
+        return;
+    }
+
+    velocityY = jumpPower;
+    onGround = false;
+}
+
+// ==========================================
+// گرانش
+// ==========================================
+
+function applyGravity() {
+
+    if (onGround) {
+        return;
+    }
+
+    velocityY -= gravity;
+    playerY += velocityY;
+
+    // برخورد با زمین
+    if (playerY <= 80) {
+        playerY = 80;
+        velocityY = 0;
+        onGround = true;
+    }
+
+    updatePlayer();
+}
+
+// ==========================================
+// کنترل دکمه چپ
+// ==========================================
+
+function leftStart(event) {
+    if (event) event.preventDefault();
+    movingLeft = true;
+}
+
+function leftStop(event) {
+    if (event) event.preventDefault();
+    movingLeft = false;
+}
+
+leftBtn.addEventListener("mousedown", leftStart);
+leftBtn.addEventListener("mouseup", leftStop);
+leftBtn.addEventListener("mouseleave", leftStop);
+
+leftBtn.addEventListener("touchstart", leftStart, {
+    passive: false
+});
+
+leftBtn.addEventListener("touchend", leftStop, {
+    passive: false
+});
+
+// ==========================================
+// کنترل دکمه راست
+// ==========================================
+
+function rightStart(event) {
+    if (event) event.preventDefault();
+    movingRight = true;
+}
+
+function rightStop(event) {
+    if (event) event.preventDefault();
+    movingRight = false;
+}
+
+rightBtn.addEventListener("mousedown", rightStart);
+rightBtn.addEventListener("mouseup", rightStop);
+rightBtn.addEventListener("mouseleave", rightStop);
+
+rightBtn.addEventListener("touchstart", rightStart, {
+    passive: false
+});
+
+rightBtn.addEventListener("touchend", rightStop, {
+    passive: false
+});
+
+// ==========================================
+// دکمه پرش
+// ==========================================
+
+jumpBtn.addEventListener("click", jump);
+
+jumpBtn.addEventListener("touchstart", function(event) {
+    event.preventDefault();
+    jump();
+}, {
+    passive: false
+});
+
+// ==========================================
+// کنترل کیبورد
+// ==========================================
+
+document.addEventListener("keydown", function(event) {
+
+    if (
+        event.key === "ArrowLeft" ||
+        event.key.toLowerCase() === "a"
+    ) {
+        movingLeft = true;
+    }
+
+    if (
+        event.key === "ArrowRight" ||
+        event.key.toLowerCase() === "d"
+    ) {
+        movingRight = true;
     }
 
     if (
@@ -109,102 +207,298 @@ document.addEventListener("keydown", (event) => {
     }
 });
 
-document.addEventListener("keyup", (event) => {
+document.addEventListener("keyup", function(event) {
 
-    if (event.key === "ArrowLeft" || event.key.toLowerCase() === "a") {
-        state.movingLeft = false;
+    if (
+        event.key === "ArrowLeft" ||
+        event.key.toLowerCase() === "a"
+    ) {
+        movingLeft = false;
     }
 
-    if (event.key === "ArrowRight" || event.key.toLowerCase() === "d") {
-        state.movingRight = false;
+    if (
+        event.key === "ArrowRight" ||
+        event.key.toLowerCase() === "d"
+    ) {
+        movingRight = false;
     }
 });
 
-// ---------- پرش ----------
-function jump() {
+// ==========================================
+// سکه
+// ==========================================
 
-    if (state.onGround) {
-        state.velocityY = state.jumpPower;
-        state.onGround = false;
+const coin = document.createElement("div");
+
+coin.style.position = "absolute";
+coin.style.width = "25px";
+coin.style.height = "25px";
+coin.style.borderRadius = "50%";
+coin.style.background = "gold";
+coin.style.border = "3px solid #d99b00";
+coin.style.left = "300px";
+coin.style.bottom = "100px";
+coin.style.zIndex = "30";
+
+game.appendChild(coin);
+
+// ==========================================
+// جمع کردن سکه
+// ==========================================
+
+function collectCoin() {
+
+    const playerRect = player.getBoundingClientRect();
+    const coinRect = coin.getBoundingClientRect();
+
+    if (
+        playerRect.left < coinRect.right &&
+        playerRect.right > coinRect.left &&
+        playerRect.top < coinRect.bottom &&
+        playerRect.bottom > coinRect.top
+    ) {
+
+        coin.remove();
+
+        coins++;
+        score += 100;
+
+        updateHUD();
     }
 }
 
-jumpBtn.addEventListener("touchstart", (event) => {
+// ==========================================
+// دشمن
+// ==========================================
+
+const enemy = document.createElement("div");
+
+enemy.style.position = "absolute";
+enemy.style.width = "45px";
+enemy.style.height = "40px";
+enemy.style.left = "550px";
+enemy.style.bottom = "80px";
+enemy.style.background = "#6b4b2a";
+enemy.style.borderRadius = "50% 50% 35% 35%";
+enemy.style.border = "3px solid #3e2918";
+enemy.style.zIndex = "30";
+
+game.appendChild(enemy);
+
+let enemyDirection = -1;
+let enemyX = 550;
+
+// ==========================================
+// حرکت دشمن
+// ==========================================
+
+function moveEnemy() {
+
+    enemyX += enemyDirection * 2;
+
+    if (enemyX <= 400) {
+        enemyDirection = 1;
+    }
+
+    if (enemyX >= 650) {
+        enemyDirection = -1;
+    }
+
+    enemy.style.left = enemyX + "px";
+}
+
+// ==========================================
+// برخورد با دشمن
+// ==========================================
+
+function checkEnemyCollision() {
+
+    const playerRect = player.getBoundingClientRect();
+    const enemyRect = enemy.getBoundingClientRect();
+
+    if (
+        playerRect.left < enemyRect.right &&
+        playerRect.right > enemyRect.left &&
+        playerRect.top < enemyRect.bottom &&
+        playerRect.bottom > enemyRect.top
+    ) {
+
+        lives--;
+
+        score = Math.max(0, score - 50);
+
+        playerX = 80;
+        playerY = 80;
+
+        updateHUD();
+
+        if (lives <= 0) {
+            endGame();
+        }
+    }
+}
+
+// ==========================================
+// شلیک
+// ==========================================
+
+function shoot() {
+
+    if (gameOver) {
+        return;
+    }
+
+    const bullet = document.createElement("div");
+
+    bullet.style.position = "absolute";
+    bullet.style.width = "14px";
+    bullet.style.height = "7px";
+    bullet.style.background = "white";
+    bullet.style.borderRadius = "10px";
+    bullet.style.left = (playerX + 45) + "px";
+    bullet.style.bottom = (playerY + 25) + "px";
+    bullet.style.zIndex = "40";
+
+    game.appendChild(bullet);
+
+    let bulletX = playerX + 45;
+
+    const bulletTimer = setInterval(function() {
+
+        bulletX += 9;
+
+        bullet.style.left = bulletX + "px";
+
+        // برخورد تیر با دشمن
+        const bulletRect = bullet.getBoundingClientRect();
+        const enemyRect = enemy.getBoundingClientRect();
+
+        if (
+            bulletRect.left < enemyRect.right &&
+            bulletRect.right > enemyRect.left &&
+            bulletRect.top < enemyRect.bottom &&
+            bulletRect.bottom > enemyRect.top
+        ) {
+
+            clearInterval(bulletTimer);
+
+            bullet.remove();
+
+            enemyX = 700;
+            score += 200;
+
+            updateHUD();
+        }
+
+        // خروج تیر از صفحه
+        if (bulletX > game.clientWidth) {
+
+            clearInterval(bulletTimer);
+
+            bullet.remove();
+        }
+
+    }, 20);
+}
+
+shootBtn.addEventListener("click", shoot);
+
+shootBtn.addEventListener("touchstart", function(event) {
     event.preventDefault();
-    jump();
+    shoot();
+}, {
+    passive: false
 });
 
-jumpBtn.addEventListener("click", jump);
+// ==========================================
+// HUD
+// ==========================================
 
-// ---------- شلیک فعلاً ----------
-shootBtn.addEventListener("click", () => {
-    console.log("🔫 Shoot button pressed!");
-});
-
-// ---------- به‌روزرسانی موقعیت ----------
-function updatePlayer() {
-
-    // حرکت افقی
-    if (state.movingLeft) {
-        state.velocityX = -state.speed;
-    } 
-    else if (state.movingRight) {
-        state.velocityX = state.speed;
-    } 
-    else {
-        state.velocityX = 0;
-    }
-
-    state.x += state.velocityX;
-
-    // محدود کردن حرکت به صفحه
-    const maxX = game.clientWidth - player.offsetWidth;
-
-    if (state.x < 0) {
-        state.x = 0;
-    }
-
-    if (state.x > maxX) {
-        state.x = maxX;
-    }
-
-    // گرانش
-    state.velocityY -= state.gravity;
-
-    state.y -= state.velocityY;
-
-    // برخورد با زمین
-    const groundY = groundHeight;
-
-    if (state.y <= groundY) {
-        state.y = groundY;
-        state.velocityY = 0;
-        state.onGround = true;
-    }
-
-    // نمایش بازیکن
-    player.style.left = state.x + "px";
-    player.style.bottom = state.y + "px";
-}
-
-// ---------- HUD ----------
 function updateHUD() {
-    livesText.textContent = state.lives;
-    coinsText.textContent = state.coins;
-    scoreText.textContent = state.score;
+
+    livesText.textContent = lives;
+    coinsText.textContent = coins;
+    scoreText.textContent = score;
 }
 
-// ---------- حلقه اصلی بازی ----------
+// ==========================================
+// پایان بازی
+// ==========================================
+
+function endGame() {
+
+    gameOver = true;
+
+    const message = document.createElement("div");
+
+    message.id = "gameOverMessage";
+
+    message.style.position = "absolute";
+    message.style.left = "50%";
+    message.style.top = "50%";
+    message.style.transform = "translate(-50%, -50%)";
+
+    message.style.padding = "25px 35px";
+
+    message.style.background = "rgba(0,0,0,0.85)";
+    message.style.color = "white";
+
+    message.style.borderRadius = "20px";
+
+    message.style.textAlign = "center";
+    message.style.fontSize = "24px";
+    message.style.fontWeight = "bold";
+
+    message.style.zIndex = "500";
+
+    message.innerHTML = `
+        💔 بازی تمام شد!
+        <br>
+        <small>امتیاز: ${score}</small>
+        <br><br>
+        <button onclick="location.reload()"
+        style="
+        padding:10px 20px;
+        border:none;
+        border-radius:10px;
+        font-size:18px;
+        cursor:pointer;
+        ">
+        دوباره بازی
+        </button>
+    `;
+
+    game.appendChild(message);
+}
+
+// ==========================================
+// حلقه اصلی بازی
+// ==========================================
+
 function gameLoop() {
 
-    updatePlayer();
-    updateHUD();
+    if (!gameOver) {
+
+        movePlayer();
+        applyGravity();
+
+        moveEnemy();
+
+        collectCoin();
+
+        checkEnemyCollision();
+    }
 
     requestAnimationFrame(gameLoop);
 }
 
-// ---------- شروع بازی ----------
+// ==========================================
+// شروع بازی
+// ==========================================
+
+updatePlayer();
 updateHUD();
+
 gameLoop();
 
-console.log("🍄 Elina Mushroom Adventure started!");
+console.log("🍄 Elina Mushroom Adventure is running!");
