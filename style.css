@@ -1,0 +1,283 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+    background: #111;
+}
+
+#game {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+
+    background:
+        linear-gradient(
+            to bottom,
+            #63c5ff 0%,
+            #b9ecff 60%,
+            #82d65c 60%,
+            #4b9e38 100%
+        );
+}
+
+/* ابرهای پس‌زمینه */
+#game::before,
+#game::after {
+    content: "";
+    position: absolute;
+    width: 140px;
+    height: 45px;
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 50px;
+    top: 15%;
+}
+
+#game::before {
+    left: 8%;
+    box-shadow:
+        35px -18px 0 8px rgba(255, 255, 255, 0.85),
+        70px 0 0 2px rgba(255, 255, 255, 0.85);
+}
+
+#game::after {
+    right: 8%;
+    top: 28%;
+    transform: scale(0.8);
+}
+
+/* اطلاعات بازی */
+#hud {
+    position: absolute;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: min(92%, 700px);
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 10px 18px;
+
+    background: rgba(0, 0, 0, 0.45);
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    border-radius: 16px;
+
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+
+    backdrop-filter: blur(5px);
+
+    z-index: 100;
+}
+
+#hud span {
+    white-space: nowrap;
+}
+
+/* کاراکتر */
+#player {
+    position: absolute;
+
+    left: 80px;
+    bottom: 80px;
+
+    width: 45px;
+    height: 60px;
+
+    background: linear-gradient(
+        to bottom,
+        #ffb6d5,
+        #ff5fa2
+    );
+
+    border: 3px solid #8d2859;
+    border-radius: 22px 22px 12px 12px;
+
+    box-shadow:
+        0 5px 0 rgba(0, 0, 0, 0.25),
+        inset 0 5px 8px rgba(255, 255, 255, 0.35);
+
+    z-index: 50;
+}
+
+/* چشم‌های ساده کاراکتر */
+#player::before {
+    content: "••";
+
+    position: absolute;
+    top: 14px;
+    left: 11px;
+
+    color: #222;
+    font-size: 17px;
+    letter-spacing: 5px;
+}
+
+/* زمین */
+#ground {
+    position: absolute;
+
+    left: 0;
+    bottom: 0;
+
+    width: 100%;
+    height: 80px;
+
+    background:
+        linear-gradient(
+            to bottom,
+            #63c94b 0 25%,
+            #4d9d37 25% 35%,
+            #805b32 35% 100%
+        );
+
+    border-top: 5px solid #347d29;
+
+    z-index: 40;
+}
+
+/* کنترل‌ها */
+#controls {
+    position: absolute;
+
+    left: 0;
+    bottom: 18px;
+
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 18px;
+
+    z-index: 200;
+}
+
+/* دکمه‌ها */
+#controls button {
+    width: 64px;
+    height: 64px;
+
+    border: 3px solid white;
+    border-radius: 50%;
+
+    background: rgba(20, 20, 20, 0.55);
+
+    color: white;
+
+    font-size: 25px;
+    font-weight: bold;
+
+    box-shadow:
+        0 5px 10px rgba(0, 0, 0, 0.3);
+
+    cursor: pointer;
+
+    touch-action: manipulation;
+
+    transition:
+        transform 0.1s,
+        background 0.1s;
+}
+
+#controls button:active {
+    transform: scale(0.88);
+    background: rgba(255, 255, 255, 0.35);
+}
+
+/* دکمه‌های حرکت */
+#leftBtn {
+    margin-right: 7px;
+}
+
+#rightBtn {
+    margin-right: auto;
+}
+
+/* دکمه پرش */
+#jumpBtn {
+    margin-right: 10px;
+}
+
+/* دکمه شلیک */
+#shootBtn {
+    background: rgba(180, 40, 40, 0.65);
+}
+
+/* حالت کامپیوتر */
+@media (min-width: 800px) {
+
+    #controls button {
+        width: 70px;
+        height: 70px;
+    }
+
+    #hud {
+        font-size: 18px;
+    }
+}
+
+/* موبایل */
+@media (max-width: 500px) {
+
+    #hud {
+        top: 10px;
+        width: 94%;
+        padding: 8px 10px;
+        font-size: 13px;
+    }
+
+    #controls {
+        bottom: 12px;
+        padding: 0 10px;
+    }
+
+    #controls button {
+        width: 57px;
+        height: 57px;
+        font-size: 22px;
+    }
+
+    #player {
+        width: 40px;
+        height: 55px;
+        left: 60px;
+    }
+
+    #ground {
+        height: 75px;
+    }
+}
+
+/* صفحه خیلی کوچک */
+@media (max-height: 500px) {
+
+    #controls {
+        bottom: 8px;
+    }
+
+    #controls button {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+
+    #hud {
+        top: 5px;
+        padding: 5px 9px;
+    }
+}
