@@ -2,32 +2,96 @@
 <html lang="fa">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
     <title>Elina Mushroom Adventure</title>
+
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <div id="game">
-        <div id="hud">
-            <span>❤️ جان: <b id="lives">3</b></span>
-            <span>🪙 سکه: <b id="coins">0</b></span>
-            <span>⭐ امتیاز: <b id="score">0</b></span>
+<div id="game">
+
+    <!-- پس‌زمینه -->
+    <div id="sky"></div>
+
+    <!-- دوربین بازی -->
+    <div id="world">
+
+        <!-- بازیکن -->
+        <div id="player">
+            <div class="hair"></div>
+            <div class="face">
+                <span class="eye left-eye"></span>
+                <span class="eye right-eye"></span>
+                <span class="mouth"></span>
+            </div>
+            <div class="body"></div>
+            <div class="leg left-leg"></div>
+            <div class="leg right-leg"></div>
         </div>
 
-        <div id="player"></div>
+        <!-- آبجکت‌های مرحله اینجا ساخته می‌شوند -->
 
-        <div id="ground"></div>
-
-        <div id="controls">
-            <button id="leftBtn">◀</button>
-            <button id="rightBtn">▶</button>
-            <button id="jumpBtn">⬆</button>
-            <button id="shootBtn">🔫</button>
-        </div>
     </div>
 
-    <script src="game.js"></script>
+    <!-- اطلاعات بازی -->
+    <div id="hud">
+
+        <div class="hud-box">
+            ❤️ <span id="lives">3</span>
+        </div>
+
+        <div class="hud-box">
+            🪙 <span id="coins">0</span>
+        </div>
+
+        <div class="hud-box">
+            ⭐ <span id="score">0</span>
+        </div>
+
+        <div class="hud-box">
+            🌍 <span id="worldNumber">1</span>-<span id="levelNumber">1</span>
+        </div>
+
+    </div>
+
+    <!-- پیام‌های بازی -->
+    <div id="message"></div>
+
+    <!-- کنترل موبایل -->
+    <div id="mobileControls">
+
+        <div class="movement">
+
+            <button id="leftBtn" class="control">
+                ◀
+            </button>
+
+            <button id="rightBtn" class="control">
+                ▶
+            </button>
+
+        </div>
+
+        <div class="actions">
+
+            <button id="jumpBtn" class="control jump">
+                ⬆
+            </button>
+
+            <button id="shootBtn" class="control shoot">
+                ●
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="game.js"></script>
+
 </body>
 </html>
